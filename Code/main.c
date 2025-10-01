@@ -18,7 +18,7 @@ struct Evaluation{
 
 int addEvaluation(){
     struct Evaluation e;
-    FILE *fp = fopen(FILECSV, "a+");  
+    FILE *fp = fopen(FILECSV, "a");  // a คือเพิ่มข้อมูลต่อท้าย //
     if (!fp) {                         
         printf("Cannot open the file\n");
 }
@@ -31,23 +31,42 @@ int addEvaluation(){
     scanf("%d", &e.rating);
 
     printf("Enter date (XXXX-XX-XX): ");
-    scanf(" %s", e.date);
+    scanf(" %s", &e.date);
 
     printf("Enter comment: ");
-    scanf(" %s", e.comment);
+    scanf(" %s", &e.comment);
 
-    fprintf(fp, "%s,%d,%s,%s\n", e.name, e.rating, e.date, e.comment);
+    fprintf(fp, "%s,%d,%s,%s\n", e.name, e.rating, e.date, e.comment); 
 }
+//.................................//
+       // สร้างFuntionอ่านข้อมูล//
 
+int readEvaluation(){
+    struct Evaluation e;
+    FILE *fp = fopen(FILECSV, "r");  // r คืออ่านอย่างเดียว //
+     if (!fp) {                         
+        printf("Cannot open the file\n");
+}
+    char line[1000];
+    printf("Reading evaluation\n");
+    while (fgets(line, sizeof(line), fp)) {
+        struct Evaluation e;
+        sscanf(line, "%s,%d,%s,%s\n", e.name, e.rating, e.date, e.comment);
+        printf("Name %s rating %d date %s commet %s\n", e.name, e.rating, e.date, e.comment);
+}
+fclose(fp);
+}
 
 int main() {
     struct Evaluation e;   
         printf("Customer Service Evaluation Data Management System\n");
         printf("1. Add evaluation data\n");
+        printf("2. Read evaluation\n");
         printf("Select menu: ");
         scanf("%d", &choice);
     switch (choice) {
         case 1: addEvaluation(); break;
+        case 2: readEvaluation(); break;
 
         
 }

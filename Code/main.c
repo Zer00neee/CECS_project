@@ -81,7 +81,10 @@ void searchEvaluation() {
     fgets(line, sizeof(line), fr);
     printf("Search Results:\n");
     while(fgets(line, sizeof(line), fr) != NULL){
-        if(strstr(line, searchName) != NULL) {
+        char linecpy[600];
+        strcpy(linecpy, line);
+        char *name = strtok(linecpy, ",");
+        if(strcmp(name, searchName) == 0) {
             printf("%s", line);
             found = 1;
         }
@@ -103,12 +106,15 @@ void searchEvaluation() {
         start();
     }
 }
+void updateEvaluation() {
 
+}
 void start(){
      int choice;
     printf("Customer Service Evaluation Data Management System\n");
     printf("1. Add evaluation\n");
     printf("2. Search evaluation\n");
+    printf("3. Update evaluation\n");
     printf("Select menu: ");
     scanf("%d", &choice);
     switch(choice) {

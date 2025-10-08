@@ -191,17 +191,23 @@ void searchEvaluation() {
     int found = 0; 
     printf("Enter the name to search: ");
     scanf("%49s", searchName);
-    FILE *fr = fopen("evaluation.csv", "r");
+    FILE *fr = fopen(FILECSV, "r");
     if(fr == NULL) {
         printf("Cannot open file!\n");
+        return;
     }
-    fgets(line, sizeof(line), fr);
+    if(fgets(line, sizeof(line), fr) == NULL) {
+        printf("No records found.\n");
+        fclose(fr);
+        return;
+    }
     printf("Search Results:\n");
     while(fgets(line, sizeof(line), fr) != NULL){
         char linecpy[600];
         strcpy(linecpy, line);
-        char *name = strtok(linecpy, ",");
-        if(strcmp(name, searchName) == 0) {
+        char *ID = strtok(linecpy, ",");
+        char *name = strtok(NULL, ",");
+        if(name && strcmp(name, searchName) == 0) {
             printf("%s", line);
             found = 1;
         }
@@ -341,6 +347,18 @@ void deleteEvaluationByID() {
         remove(tempFile);
         printf("ID not found.\n");
     }
+    char choice;
+    printf("add more y = yes / n = no / r = retun: ");
+    scanf(" %c", &choice);
+    if(choice == 'y'){
+        addEvaluation();
+    }
+    if(choice == 'n'){
+        printf("Thank you\n");
+    }
+    if(choice == 'r'){
+        start();
+    }
 }
 
 void readevaluation() {
@@ -364,6 +382,18 @@ void readevaluation() {
     }
 
     fclose(fr);
+    char choice;
+    printf("add more y = yes / n = no / r = retun: ");
+    scanf(" %c", &choice);
+    if(choice == 'y'){
+        addEvaluation();
+    }
+    if(choice == 'n'){
+        printf("Thank you\n");
+    }
+    if(choice == 'r'){
+        start();
+    }
 }
 
 
@@ -384,6 +414,7 @@ void start(){
     case 4: deleteEvaluationByID(); break;
     case 5: readevaluation(); break;
     }
+    
 }
 
 int main() {

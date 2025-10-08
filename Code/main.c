@@ -1,8 +1,12 @@
 #include<stdio.h>
 #include<string.h>
 #define FILECSV "evaluations.csv"
+void start();
+void addEvaluation();
+void searchEvaluation();    
+void updateEvaluation();
 
-void addtocsv(char name[], int rating, char date[], char feedback[]){
+void addtocsv(char name[], int rating, char day[], char month[], char year[], char feedback[]){
        if(rating < 1 || rating > 5) {
         printf("!!!rating (1-5)!!!!\n");
         printf("Enter again y = yes / n = no / r = retun\n");
@@ -19,6 +23,75 @@ void addtocsv(char name[], int rating, char date[], char feedback[]){
         }
         }
     else{
+        if(month[1] == '2' && day[0] <= '2' && day[1] <= '9'){
+            
+        }else{
+            if(month[1] == '4' && day[0] <= '3' && day[1] <= '0'){
+                
+            }else{
+                if(month[1] == '6' && day[0] <= '3' && day[1] <= '0'){
+                    
+                }else{
+                    if(month[1] == '9' && day[0] <= '3' && day[1] <= '0'){
+                        
+                    }else{
+                        if(month[1] == '1' || month[1] == '3' || month[1] == '5' || month[1] == '7' || month[1] == '8' || month[1] == '0'){
+                            if(day[0] <= '3' && day[1] <= '1'){
+                                
+                            }else{
+                                printf("!!!day (01-31)!!!!\n");
+                                printf("Enter again y = yes / n = no / r = retun\n");
+                                char type;
+                                scanf(" %c", &type);
+                                if(type == 'y'){
+                                    addEvaluation();
+                                }
+                                if(type == 'n'){
+                                    printf("Thank you\n");
+                                }
+                                if(type == 'r'){
+                                    start();
+                                }
+                            }
+                        }else{
+                            if(month[1] == '2'){
+                                if(day[0] <= '2' && day[1] <= '9'){
+                                    
+                                }else{
+                                    printf("!!!day (01-29)!!!!\n");
+                                    printf("Enter again y = yes / n = no / r = retun\n");
+                                    char type;
+                                    scanf(" %c", &type);
+                                    if(type == 'y'){
+                                        addEvaluation();
+                                    }
+                                    if(type == 'n'){
+                                        printf("Thank you\n");
+                                    }
+                                    if(type == 'r'){
+                                        start();
+                                    }
+                                }
+                            }else{
+                                printf("!!!month (01-12)!!!!\n");
+                                printf("Enter again y = yes / n = no / r = retun\n");
+                                char type;
+                                scanf(" %c", &type);
+                                if(type == 'y'){
+                                    addEvaluation();
+                                }
+                                if(type == 'n'){
+                                    printf("Thank you\n");
+                                }
+                                if(type == 'r'){
+                                    start();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
          int fileExists = 0;
     FILE *fr = fopen("evaluation.csv", "r");
     if(fr != NULL){
@@ -30,10 +103,10 @@ void addtocsv(char name[], int rating, char date[], char feedback[]){
         printf("Cannot open file!\n");
     }
     if(fileExists == 0){
-        fprintf(fp, "EvaluatorName,ServiceRating,EvaluatorDate,Feedback\n");
+        fprintf(fp, "EvaluatorName,ServiceRating,Day,Month,Year,Feedback\n");
     }
 
-    fprintf(fp, "%s,%d,%s,%s\n", name, rating, date, feedback);
+    fprintf(fp, "%s,%d,%s,%s,%s,%s\n", name, rating, day,month,year, feedback);
     fclose(fp);
     char choice;
     printf("add more y = yes / n = no / r = retun: ");
@@ -54,18 +127,22 @@ void addtocsv(char name[], int rating, char date[], char feedback[]){
 void addEvaluation() {
     char name[50];
     int rating;
-    char date[11];
+    char day[3], month[3], year[5];
     char feedback[500];
 
     printf("Enter name: ");
     scanf("%49s", name);
     printf("Enter score(1-5): ");
     scanf("%d", &rating);
-    printf("EnterDate(DD-MM-YYYY):");
-    scanf("%10s", date);
+    printf("EnterDay(DD):");
+    scanf("%3s", day);
+    printf("EnterMonth(MM):");
+    scanf("%3s", month);
+    printf("EnterYear(YYYY):");
+    scanf("%5s", year);
     printf("Enter feedblack: ");
     scanf("%499s", feedback);
-    addtocsv(name, rating, date, feedback);
+    addtocsv(name, rating, day, month, year, feedback);
 }
 
 void searchEvaluation() {

@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<string.h>
 #define FILECSV "evaluations.csv"
+#include"UnitTest.c"
 
 void start();
 void addEvaluation();
@@ -10,6 +11,8 @@ void updateEvaluation();
 void deleteEvaluation();
 void readevaluation();
 void choice();
+void Test();
+void addtocsv(char name[], int rating, char day[], char month[], char year[], char feedback[]);
 
 ///////////ADDCSV-----------------
 
@@ -188,7 +191,6 @@ if(fileExists == 0){
 fprintf(fp, "%d,%s,%d,%s,%s,%s,%s\n", id, name, rating, day, month, year, feedback);
 fclose(fp);
 
-   choice();
 }
 
 //////////ADD EVALUATION---------------------
@@ -212,6 +214,7 @@ void addEvaluation() {
     printf("Enter feedblack: (***no spacesbar***) ");
     scanf("%499s", feedback);
     addtocsv(name, rating, day, month, year, feedback);
+    choice();
 }
 
 ///////////SEARCH EVALUATION----------------------
@@ -459,6 +462,7 @@ void start(){
     printf("3. Update evaluation\n");
     printf("4. Delete evaluation\n");
     printf("5. Read evaluation\n");
+    printf("6. Unit Test\n");
     printf("Select menu: ");
     scanf("%d", &choice);
     switch(choice) {
@@ -467,6 +471,7 @@ void start(){
     case 3: updateEvaluationByID(); break;
     case 4: deleteEvaluationByID(); break;
     case 5: readevaluation(); break;
+    case 6: Test(); break;
     }
     
 }

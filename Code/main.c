@@ -7,11 +7,22 @@ void start();
 void addEvaluation();
 void searchEvaluation();    
 void updateEvaluation();
+void deleteEvaluation();
+void readevaluation();
+void choice();
+
+///////////ADDCSV-----------------
+
 void addtocsv(char name[], int rating, char day[], char month[], char year[], char feedback[]){
-    const char *maxDayTable[12] = {
-        "31", "29", "31", "30", "31", "30", "31", "31", "30", "31", "30", "31"};
+   
+    //////////
+
+    const char *maxDayTable[12] = { "31", "29", "31", "30", "31", "30", "31", "31", "30", "31", "30", "31"};
     int mIdx = (month[0] - '0') * 10 + (month[1] - '0') - 1;
     int validMonth = (month[0] == '0' && month[1] >= '1' && month[1] <= '9') || (month[0] == '1' && (month[1] == '0' || month[1] == '1' || month[1] == '2'));
+   
+    //////////
+
     if(strlen(year) != 4) {
         printf("!!!year (YYYY)!!!!\n");
         printf("Enter again y = yes / n = no / r = retun\n");
@@ -28,6 +39,9 @@ void addtocsv(char name[], int rating, char day[], char month[], char year[], ch
         }
         return;
     }
+  
+    //////////
+    
     if(strlen(month) != 2) {
         printf("!!!month (01-12)!!!!\n");
         printf("Enter again y = yes / n = no / r = retun\n");
@@ -44,6 +58,9 @@ void addtocsv(char name[], int rating, char day[], char month[], char year[], ch
         }
         return;
     }
+   
+    //////////
+   
     if(strlen(day) != 2) {
         printf("!!!day (01-%s)!!!!\n", maxDayTable[0]);
         printf("Enter again y = yes / n = no / r = retun\n");
@@ -60,6 +77,9 @@ void addtocsv(char name[], int rating, char day[], char month[], char year[], ch
         }
         return;
     }
+
+    //////////
+
     if(!validMonth) {
         printf("!!!month (01-12)!!!!\n");
         printf("Enter again y = yes / n = no / r = retun\n");
@@ -76,6 +96,9 @@ void addtocsv(char name[], int rating, char day[], char month[], char year[], ch
         }
         return;
     }
+    
+    //////////
+
     const char *maxDayStr = maxDayTable[mIdx];
     if(day[0] < '0' || day[0] > '3' || day[1] < '0' || day[1] > '9' || (day[0] == '0' && day[1] == '0')) {
         printf("!!!day (01-%s)!!!!\n", maxDayStr);
@@ -93,6 +116,9 @@ void addtocsv(char name[], int rating, char day[], char month[], char year[], ch
         }
         return;
     }
+
+    //////////
+
     if(day[0] > maxDayStr[0] || (day[0] == maxDayStr[0] && day[1] > maxDayStr[1])) {
         printf("!!!day (01-%s)!!!!\n", maxDayStr);
         printf("Enter again y = yes / n = no / r = retun\n");
@@ -109,6 +135,9 @@ void addtocsv(char name[], int rating, char day[], char month[], char year[], ch
         }
         return;
     }
+
+    //////////
+
     if(rating < 1 || rating > 5) {
         printf("!!!rating (1-5)!!!!\n");
         printf("Enter again y = yes / n = no / r = retun\n");
@@ -125,6 +154,9 @@ void addtocsv(char name[], int rating, char day[], char month[], char year[], ch
         }
         return;
     }
+    
+    //////////
+
     int fileExists = 0;
     int id = 1;  
 FILE *fr = fopen(FILECSV, "r");
@@ -139,30 +171,27 @@ if(fr != NULL){
     id = count + 1; 
     fclose(fr);
 }
+
+//////////
+
 FILE *fp = fopen(FILECSV, "a");
 if(fp == NULL){
     printf("Cannot open file!\n");
     return;
 }
+
+//////////
+
 if(fileExists == 0){
     fprintf(fp, "ID,Name,Rating,Day,Month,Year,Feedback\n");
 }
 fprintf(fp, "%d,%s,%d,%s,%s,%s,%s\n", id, name, rating, day, month, year, feedback);
 fclose(fp);
 
-    char choice;
-    printf("add more y = yes / n = no / r = retun: ");
-    scanf(" %c", &choice);
-    if(choice == 'y'){
-        addEvaluation();
-    }
-    if(choice == 'n'){
-        printf("Thank you\n");
-    }
-    if(choice == 'r'){
-        start();
-    }
+   choice();
 }
+
+//////////ADD EVALUATION---------------------
 
 void addEvaluation() {
     char name[50];
@@ -180,17 +209,23 @@ void addEvaluation() {
     scanf("%3s", month);
     printf("EnterYear(YYYY):");
     scanf("%5s", year);
-    printf("Enter feedblack: ");
+    printf("Enter feedblack: (***no spacesbar***) ");
     scanf("%499s", feedback);
     addtocsv(name, rating, day, month, year, feedback);
 }
+
+///////////SEARCH EVALUATION----------------------
 
 void searchEvaluation() {
     char searchName[50];
     char line[600];
     int found = 0; 
+
     printf("Enter the name to search: ");
     scanf("%49s", searchName);
+
+    //////////
+
     FILE *fr = fopen(FILECSV, "r");
     if(fr == NULL) {
         printf("Cannot open file!\n");
@@ -201,6 +236,9 @@ void searchEvaluation() {
         fclose(fr);
         return;
     }
+
+    //////////
+
     printf("Search Results:\n");
     while(fgets(line, sizeof(line), fr) != NULL){
         char linecpy[600];
@@ -216,19 +254,14 @@ void searchEvaluation() {
         printf("Not found %s\n", searchName);
     }
     fclose(fr);
-    char choice;
-    printf("search more y = yes / n = no / r = retun: ");
-    scanf(" %c", &choice);
-    if(choice == 'y'){
-        searchEvaluation();
-    }
-    if(choice == 'n'){
-        printf("Thank you\n");
-    }
-    if(choice == 'r'){
-        start();
-    }
+
+    //////////
+
+    choice();
 }
+
+///////////UPDATE EVALUATION----------------------
+
 void updateEvaluationByID() {
     char idStr[10];
     char line[600], tempFile[] = "temp.csv";
@@ -237,12 +270,16 @@ void updateEvaluationByID() {
     printf("Enter ID to update: ");
     scanf("%9s", idStr);
 
+    //////////
+
     FILE *fr = fopen(FILECSV, "r");
     FILE *fw = fopen(tempFile, "w");
     if (!fr || !fw) {
         printf("Cannot open file!\n");
         return;
     }
+
+    //////////
 
     fgets(line, sizeof(line), fr);
     fprintf(fw, "%s", line);
@@ -256,6 +293,8 @@ void updateEvaluationByID() {
         char *currMonth = strtok(NULL, ",");
         char *currYear = strtok(NULL, ",");
         char *currFeedback = strtok(NULL, "\n");
+
+        //////////
 
         if (strcmp(currID, idStr) == 0) {
             found = 1;
@@ -285,15 +324,23 @@ void updateEvaluationByID() {
     fclose(fr);
     fclose(fw);
 
+    //////////
+
     if (found) {
         remove(FILECSV);
         rename(tempFile, FILECSV);
-        printf("Record updated successfully.\n");
+        printf("Evaluation updated successfully.\n");
     } else {
         remove(tempFile);
         printf("ID not found.\n");
     }
+
+    //////////
+
+    choice();
 }
+
+///////////DELETE EVALUATION----------------------
 
 void deleteEvaluationByID() {
     char idStr[10];
@@ -309,6 +356,8 @@ void deleteEvaluationByID() {
         printf("Cannot open file!\n");
         return;
     }
+
+    //////////
 
     fgets(line, sizeof(line), fr);
     fprintf(fw, "%s", line);
@@ -347,19 +396,13 @@ void deleteEvaluationByID() {
         remove(tempFile);
         printf("ID not found.\n");
     }
-    char choice;
-    printf("add more y = yes / n = no / r = retun: ");
-    scanf(" %c", &choice);
-    if(choice == 'y'){
-        addEvaluation();
-    }
-    if(choice == 'n'){
-        printf("Thank you\n");
-    }
-    if(choice == 'r'){
-        start();
-    }
+
+    //////////
+
+    choice();
 }
+
+///////////READ EVALUATION----------------------
 
 void readevaluation() {
     FILE *fr = fopen(FILECSV, "r");
@@ -382,8 +425,17 @@ void readevaluation() {
     }
 
     fclose(fr);
+
+    //////////
+
+    choice();
+}
+
+///////////CHOICE----------------------
+
+void choice(){
     char choice;
-    printf("add more y = yes / n = no / r = retun: ");
+    printf("add more y = yes / n = no / m = menu: ");
     scanf(" %c", &choice);
     if(choice == 'y'){
         addEvaluation();
@@ -395,6 +447,8 @@ void readevaluation() {
         start();
     }
 }
+
+///////////START----------------------
 
 
 void start(){

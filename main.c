@@ -1,481 +1,378 @@
+#include <stdio.h>
+#include <string.h>
+#include "main.h" 
+#include "UnitTest.c" 
+#include "E2Etest.c" 
 
-#include<stdio.h>
-#include<string.h>
 #define FILECSV "evaluations.csv"
-#include"UnitTest.c"
 
-void start();
-void addEvaluation();
-void searchEvaluation();    
-void updateEvaluation();
-void deleteEvaluation();
-void readevaluation();
-void choice();
-void Test();
-void addtocsv(char name[], int rating, char day[], char month[], char year[], char feedback[]);
+//VALIDATION LOGIC
 
-///////////ADDCSV-----------------
-
-void addtocsv(char name[], int rating, char day[], char month[], char year[], char feedback[]){
-   
-    //////////
-
+int validate_evaluation_data(int rating, const char day[], const char month[], const char year[]){
     const char *maxDayTable[12] = { "31", "29", "31", "30", "31", "30", "31", "31", "30", "31", "30", "31"};
+    if (strlen(year) != 4) { printf("Error: Invalid year format (YYYY).\n"); return 0; }
+    if (strlen(month) != 2) { printf("Error: Invalid month format (MM).\n"); return 0; }
+    int validMonth = (month[0] == '0' && month[1] >= '1' && month[1] <= '9') || (month[0] == '1' && (month[1] >= '0' && month[1] <= '2'));
+    if (!validMonth) { printf("Error: Month must be between 01-12.\n"); return 0; }
     int mIdx = (month[0] - '0') * 10 + (month[1] - '0') - 1;
-    int validMonth = (month[0] == '0' && month[1] >= '1' && month[1] <= '9') || (month[0] == '1' && (month[1] == '0' || month[1] == '1' || month[1] == '2'));
-   
-    //////////
-
-    if(strlen(year) != 4) {
-        printf("!!!year (YYYY)!!!!\n");
-        printf("Enter again y = yes / n = no / r = retun\n");
-        char type;
-        scanf(" %c", &type);
-        if(type == 'y'){
-            addEvaluation();
-        }
-        if(type == 'n'){
-            printf("Thank you\n");
-        }
-        if(type == 'r'){
-            start();
-        }
-        return;
-    }
-  
-    //////////
-    
-    if(strlen(month) != 2) {
-        printf("!!!month (01-12)!!!!\n");
-        printf("Enter again y = yes / n = no / r = retun\n");
-        char type;
-        scanf(" %c", &type);
-        if(type == 'y'){
-            addEvaluation();
-        }
-        if(type == 'n'){
-            printf("Thank you\n");
-        }
-        if(type == 'r'){
-            start();
-        }
-        return;
-    }
-   
-    //////////
-   
-    if(strlen(day) != 2) {
-        printf("!!!day (01-%s)!!!!\n", maxDayTable[0]);
-        printf("Enter again y = yes / n = no / r = retun\n");
-        char type;
-        scanf(" %c", &type);
-        if(type == 'y'){
-            addEvaluation();
-        }
-        if(type == 'n'){
-            printf("Thank you\n");
-        }
-        if(type == 'r'){
-            start();
-        }
-        return;
-    }
-
-    //////////
-
-    if(!validMonth) {
-        printf("!!!month (01-12)!!!!\n");
-        printf("Enter again y = yes / n = no / r = retun\n");
-        char type;
-        scanf(" %c", &type);
-        if(type == 'y'){
-            addEvaluation();
-        }
-        if(type == 'n'){
-            printf("Thank you\n");
-        }
-        if(type == 'r'){
-            start();
-        }
-        return;
-    }
-    
-    //////////
-
     const char *maxDayStr = maxDayTable[mIdx];
-    if(day[0] < '0' || day[0] > '3' || day[1] < '0' || day[1] > '9' || (day[0] == '0' && day[1] == '0')) {
-        printf("!!!day (01-%s)!!!!\n", maxDayStr);
-        printf("Enter again y = yes / n = no / r = retun\n");
-        char type;
-        scanf(" %c", &type);
-        if(type == 'y'){
-            addEvaluation();
-        }
-        if(type == 'n'){
-            printf("Thank you\n");
-        }
-        if(type == 'r'){
-            start();
-        }
-        return;
+    if (strlen(day) != 2) { printf("Error: Invalid day format (DD).\n"); return 0; }
+    if (day[0] < '0' || (day[0] == '0' && day[1] == '0')) { printf("Error: Day is invalid.\n"); return 0; }
+    if (day[0] > maxDayStr[0] || (day[0] == maxDayStr[0] && day[1] > maxDayStr[1])) { printf("Error: Day is out of range for month (max: %s).\n", maxDayStr); return 0; }
+    if (rating < 1 || rating > 5) { printf("Error: Rating must be between 1-5.\n"); return 0; }
+    return 1;
+}
+
+//ADD TO CSV
+
+void addtocsv(const char name[], int rating, const char day[], const char month[], const char year[], const char feedback[]){
+    if (!validate_evaluation_data(rating, day, month, year)) {
+        printf("\n!!! Data validation failed. Record not added. Please try again. !!!\n");
+        return; 
     }
-
-    //////////
-
-    if(day[0] > maxDayStr[0] || (day[0] == maxDayStr[0] && day[1] > maxDayStr[1])) {
-        printf("!!!day (01-%s)!!!!\n", maxDayStr);
-        printf("Enter again y = yes / n = no / r = retun\n");
-        char type;
-        scanf(" %c", &type);
-        if(type == 'y'){
-            addEvaluation();
-        }
-        if(type == 'n'){
-            printf("Thank you\n");
-        }
-        if(type == 'r'){
-            start();
-        }
-        return;
-    }
-
-    //////////
-
-    if(rating < 1 || rating > 5) {
-        printf("!!!rating (1-5)!!!!\n");
-        printf("Enter again y = yes / n = no / r = retun\n");
-        char type;
-        scanf(" %c", &type);
-        if(type == 'y'){
-            addEvaluation();
-        }
-        if(type == 'n'){
-            printf("Thank you\n");
-        }
-        if(type == 'r'){
-            start();
-        }
-        return;
-    }
-    
-    //////////
 
     int fileExists = 0;
-    int id = 1;  
-FILE *fr = fopen(FILECSV, "r");
-if(fr != NULL){
-    fileExists = 1;
-    char line[600];
-    int count = 0;
-    fgets(line, sizeof(line), fr); 
-    while(fgets(line, sizeof(line), fr) != NULL){
-        count++;
+    int id = 1;
+    FILE *fr = fopen(FILECSV, "r");
+    if (fr != NULL) {
+        fileExists = 1;
+        char line[600];
+        if (fgets(line, sizeof(line), fr) != NULL) {
+            int count = 0;
+            while (fgets(line, sizeof(line), fr) != NULL) {
+                count++;
+            }
+            id = count + 1;
+        }
+        fclose(fr);
     }
-    id = count + 1; 
-    fclose(fr);
+
+    FILE *fp = fopen(FILECSV, "a");
+    if (fp == NULL) {
+        printf("Cannot open file %s for writing!\n", FILECSV);
+        return;
+    }
+
+    if (!fileExists) {
+        fprintf(fp, "ID,Name,Rating,Day,Month,Year,Feedback\n");
+    }
+    fprintf(fp, "%d,%s,%d,%s,%s,%s,%s\n", id, name, rating, day, month, year, feedback);
+    fclose(fp);
+
+    printf("\n--- Evaluation for '%s' added successfully with ID %d ---\n", name, id);
 }
 
-//////////
-
-FILE *fp = fopen(FILECSV, "a");
-if(fp == NULL){
-    printf("Cannot open file!\n");
-    return;
-}
-
-//////////
-
-if(fileExists == 0){
-    fprintf(fp, "ID,Name,Rating,Day,Month,Year,Feedback\n");
-}
-fprintf(fp, "%d,%s,%d,%s,%s,%s,%s\n", id, name, rating, day, month, year, feedback);
-fclose(fp);
-
-}
-
-//////////ADD EVALUATION---------------------
+//ADD EVALUATION
 
 void addEvaluation() {
-    char name[50];
+    char name[50], day[3], month[3], year[5], feedback[500];
     int rating;
-    char day[3], month[3], year[5];
-    char feedback[500];
 
+    printf("\n--- Add New Evaluation ---\n");
     printf("Enter name: ");
     scanf("%49s", name);
-    printf("Enter score(1-5): ");
+    printf("Enter score (1-5): ");
     scanf("%d", &rating);
-    printf("EnterDay(DD):");
-    scanf("%3s", day);
-    printf("EnterMonth(MM):");
-    scanf("%3s", month);
-    printf("EnterYear(YYYY):");
-    scanf("%5s", year);
-    printf("Enter feedblack: (***no spacesbar***) ");
+    printf("Enter Day (DD): ");
+    scanf("%2s", day);
+    printf("Enter Month (MM): ");
+    scanf("%2s", month);
+    printf("Enter Year (YYYY): ");
+    scanf("%4s", year);
+    printf("Enter feedback (use_underscore_for_spaces): ");
     scanf("%499s", feedback);
+
     addtocsv(name, rating, day, month, year, feedback);
     choice();
 }
 
-///////////SEARCH EVALUATION----------------------
+
+//PERFORM SEARCH
+
+int perform_search(const char* searchName, const char* filename) {
+    char line[600];
+    int found_count = 0;
+
+    FILE *fr = fopen(filename, "r");
+    if (fr == NULL) {
+        return -1; 
+    }
+
+    if (fgets(line, sizeof(line), fr) == NULL) { 
+        fclose(fr);
+        return 0; 
+    }
+
+    while (fgets(line, sizeof(line), fr) != NULL) {
+        char linecpy[600];
+        strcpy(linecpy, line);
+        strtok(linecpy, ","); 
+        char *name = strtok(NULL, ",");
+
+        if (name != NULL && strcmp(name, searchName) == 0) {
+            printf("%s", line); 
+            found_count++;
+        }
+    }
+
+    fclose(fr);
+    return found_count;
+}
+
+
+//SEARCH EVALUATION
 
 void searchEvaluation() {
     char searchName[50];
-    char line[600];
-    int found = 0; 
 
+    printf("\n--- Search Evaluation by Name ---\n");
     printf("Enter the name to search: ");
     scanf("%49s", searchName);
 
-    //////////
+    printf("\nSearch Results for '%s':\n", searchName);
+    printf("--------------------------------------------------\n");
+    
+    int result_count = perform_search(searchName, FILECSV);
 
-    FILE *fr = fopen(FILECSV, "r");
-    if(fr == NULL) {
-        printf("Cannot open file!\n");
-        return;
+    if (result_count == 0) {
+        printf("Record with name '%s' not found.\n", searchName);
+    } else if (result_count == -1) {
+        printf("Cannot open file or file does not exist!\n");
     }
-    if(fgets(line, sizeof(line), fr) == NULL) {
-        printf("No records found.\n");
-        fclose(fr);
-        return;
-    }
-
-    //////////
-
-    printf("Search Results:\n");
-    while(fgets(line, sizeof(line), fr) != NULL){
-        char linecpy[600];
-        strcpy(linecpy, line);
-        char *ID = strtok(linecpy, ",");
-        char *name = strtok(NULL, ",");
-        if(name && strcmp(name, searchName) == 0) {
-            printf("%s", line);
-            found = 1;
-        }
-    }
-    if(found != 1) {
-        printf("Not found %s\n", searchName);
-    }
-    fclose(fr);
-
-    //////////
-
+    
+    printf("--------------------------------------------------\n");
     choice();
 }
 
-///////////UPDATE EVALUATION----------------------
+
+
+//UPDATE EVALUATION
 
 void updateEvaluationByID() {
-    char idStr[10];
-    char line[600], tempFile[] = "temp.csv";
+    int targetID;
     int found = 0;
+    char line[600];
+    char recordToUpdate[600] = ""; 
 
-    printf("Enter ID to update: ");
-    scanf("%9s", idStr);
-
-    //////////
+    printf("\n--- Update Evaluation by ID ---\n");
+    printf("Enter the ID of the record to update: ");
+    scanf("%d", &targetID);
 
     FILE *fr = fopen(FILECSV, "r");
-    FILE *fw = fopen(tempFile, "w");
-    if (!fr || !fw) {
-        printf("Cannot open file!\n");
+    if (fr == NULL) {
+        printf("Error: Cannot open data file!\n");
+        choice();
         return;
     }
 
-    //////////
-
     fgets(line, sizeof(line), fr);
-    fprintf(fw, "%s", line);
-    while(fgets(line, sizeof(line), fr) != NULL) {
-        char lineCopy[600];
-        strcpy(lineCopy, line);
-        char *currID = strtok(lineCopy, ",");
-        char *currName = strtok(NULL, ",");
-        char *currRating = strtok(NULL, ",");
-        char *currDay = strtok(NULL, ",");
-        char *currMonth = strtok(NULL, ",");
-        char *currYear = strtok(NULL, ",");
-        char *currFeedback = strtok(NULL, "\n");
 
-        //////////
-
-        if (strcmp(currID, idStr) == 0) {
+    while (fgets(line, sizeof(line), fr) != NULL) {
+        int currentID;
+        if (sscanf(line, "%d,", &currentID) == 1 && currentID == targetID) {
+            strcpy(recordToUpdate, line); 
             found = 1;
-            printf("Old:\n");
-            printf("Name: %s\nRating: %s\nDay: %s\nMonth: %s\nYear: %s\nFeedback: %s\n",currName, currRating, currDay, currMonth, currYear, currFeedback);
-            char newName[50], newDay[3], newMonth[3], newYear[5], newFeedback[500];
-            int newRating;
-            printf("Enter new name: ");
-            scanf("%49s", newName);
-            printf("Enter new rating (1-5): ");
-            scanf("%d", &newRating);
-            printf("Enter new day (DD): ");
-            scanf("%2s", newDay);
-            printf("Enter new month (MM): ");
-            scanf("%2s", newMonth);
-            printf("Enter new year (YYYY): ");
-            scanf("%4s", newYear);
-            printf("Enter new feedback: ");
-            scanf("%499s", newFeedback);
-
-            fprintf(fw, "%s,%s,%d,%s,%s,%s,%s\n", currID, newName, newRating, newDay, newMonth, newYear, newFeedback);
-        } else {
-            fprintf(fw, "%s", line);
+            break; 
         }
     }
+    fclose(fr);
 
+    if (!found) {
+        printf("\nRecord with ID %d not found.\n", targetID);
+        choice();
+        return;
+    }
+
+    printf("\n--- Current Data for ID %d ---\n", targetID);
+    printf("ID,Name,Rating,Day,Month,Year,Feedback\n");
+    printf("%s", recordToUpdate);
+    printf("-------------------------------------------\n");
+
+    char name[50], day[3], month[3], year[5], feedback[500];
+    int rating;
+
+    printf("\n--- Enter New Data ---\n");
+    printf("Enter new name: ");
+    scanf("%49s", name);
+    printf("Enter new score (1-5): ");
+    scanf("%d", &rating);
+    printf("Enter new Day (DD): ");
+    scanf("%2s", day);
+    printf("Enter new Month (MM): ");
+    scanf("%2s", month);
+    printf("Enter new Year (YYYY): ");
+    scanf("%4s", year);
+    printf("Enter new feedback (use_underscore_for_spaces): ");
+    scanf("%499s", feedback);
+
+    if (!validate_evaluation_data(rating, day, month, year)) {
+        printf("\n!!! New data is invalid. Update cancelled. !!!\n");
+        choice();
+        return;
+    }
+
+    fr = fopen(FILECSV, "r");
+    FILE *fw = fopen("temp.csv", "w");
+    if (fr == NULL || fw == NULL) {
+        printf("Error: Could not process file for update.\n");
+        choice();
+        return;
+    }
+
+    if (fgets(line, sizeof(line), fr) != NULL) {
+        fputs(line, fw);
+    }
+    
+    while (fgets(line, sizeof(line), fr) != NULL) {
+        int currentID;
+        sscanf(line, "%d,", &currentID);
+        if (currentID == targetID) {
+            fprintf(fw, "%d,%s,%d,%s,%s,%s,%s\n", targetID, name, rating, day, month, year, feedback);
+        } else {
+            fputs(line, fw);
+        }
+    }
+    
     fclose(fr);
     fclose(fw);
 
-    //////////
+    remove(FILECSV); 
+    rename("temp.csv", FILECSV); 
 
-    if (found) {
-        remove(FILECSV);
-        rename(tempFile, FILECSV);
-        printf("Evaluation updated successfully.\n");
-    } else {
-        remove(tempFile);
-        printf("ID not found.\n");
-    }
-
-    //////////
-
+    printf("\n--- Record ID %d updated successfully! ---\n", targetID);
     choice();
 }
 
-///////////DELETE EVALUATION----------------------
+
+//DELETE EVALUATION
 
 void deleteEvaluationByID() {
-    char idStr[10];
-    char line[600], tempFile[] = "temp.csv";
+    int targetID, currentID;
     int found = 0;
 
-    printf("Enter ID to mark as deleted: ");
-    scanf("%9s", idStr);
+    printf("\n--- Mark Record as Deleted by ID ---\n");
+    printf("Enter the ID of the record to mark as deleted: ");
+    scanf("%d", &targetID);
 
     FILE *fr = fopen(FILECSV, "r");
-    FILE *fw = fopen(tempFile, "w");
-    if (!fr || !fw) {
-        printf("Cannot open file!\n");
+    if (fr == NULL) {
+        printf("Error: Cannot open data file!\n");
+        choice();
         return;
     }
 
-    //////////
+    FILE *fw = fopen("temp.csv", "w");
+    if (fw == NULL) {
+        printf("Error: Could not create temporary file.\n");
+        fclose(fr);
+        choice();
+        return;
+    }
 
-    fgets(line, sizeof(line), fr);
-    fprintf(fw, "%s", line);
+    char line[600];
+    if (fgets(line, sizeof(line), fr) != NULL) {
+        fputs(line, fw);
+    }
 
-    while(fgets(line, sizeof(line), fr) != NULL) {
-        char lineCopy[600];
-        strcpy(lineCopy, line);
-        char *currID = strtok(lineCopy, ",");
-
-        if (strcmp(currID, idStr) == 0) {
-            found = 1;
-
-            char confirm;
-            printf("Are you sure you want to delete record ID %s as deleted? (y/n): ", idStr);
-            scanf(" %c", &confirm);
-
-            if (confirm == 'y' || confirm == 'Y') {
-                fprintf(fw, "%s,-,-,-,-,-,-\n", currID);
-                printf("Record with ID %s deleted.\n", idStr);
+    while (fgets(line, sizeof(line), fr) != NULL) {
+        if (sscanf(line, "%d,", &currentID) == 1) {
+            if (currentID != targetID) {
+                fputs(line, fw); 
             } else {
-                fprintf(fw, "%s", line);
-                printf("Operation canceled.\n");
+                found = 1; 
+                fprintf(fw, "%d,-,-,-,-,-,-\n", targetID);
             }
-        } else {
-            fprintf(fw, "%s", line);
         }
-     }
+    }
 
     fclose(fr);
     fclose(fw);
 
-    if (found) {
-        remove(FILECSV);
-        rename(tempFile, FILECSV);
+    if (!found) {
+        printf("\nRecord with ID %d not found.\n", targetID);
+        remove("temp.csv"); 
     } else {
-        remove(tempFile);
-        printf("ID not found.\n");
+        remove(FILECSV);
+        rename("temp.csv", FILECSV); 
+        printf("\n--- Record with ID %d has been marked as deleted successfully! ---\n", targetID);
     }
-
-    //////////
-
+    
     choice();
 }
 
-///////////READ EVALUATION----------------------
+// READ EVALUATION
 
 void readevaluation() {
     FILE *fr = fopen(FILECSV, "r");
     if (!fr) {
-        printf("Cannot open file!\n");
+        printf("\nCannot open file or file is empty!\n");
+        choice();
         return;
     }
 
     char line[600];
-    int lineNum = 0;
-
+    printf("\n--- All Evaluation Records ---\n");
     while (fgets(line, sizeof(line), fr) != NULL) {
-        lineNum++;
-        if (lineNum == 1) {
-            printf("%s", line);
-            continue;
-        }
-
         printf("%s", line);
     }
-
+    printf("------------------------------\n");
     fclose(fr);
-
-    //////////
-
     choice();
 }
 
-///////////CHOICE----------------------
 
-void choice(){
-    char choice;
-    printf("add more y = yes / n = no / m = menu: ");
-    scanf(" %c", &choice);
-    if(choice == 'y'){
-        addEvaluation();
-    }
-    if(choice == 'n'){
-        printf("Thank you\n");
-    }
-    if(choice == 'r'){
+//CHOICE
+
+void choice() {
+    char user_choice;
+    printf("\nContinue? (m = Main Menu / any other key = Exit): ");
+    scanf(" %c", &user_choice);
+
+    if (user_choice == 'm' || user_choice == 'M') {
         start();
+    } else {
+        printf("\nThank you for using the system. Goodbye!\n");
     }
 }
 
-///////////START----------------------
 
+//START
 
-void start(){
-     int choice;
-    printf("Customer Service Evaluation Data Management System\n");
+void start() {
+    int choice_num;
+    printf("\n===== Customer Service Evaluation System =====\n");
     printf("1. Add evaluation\n");
     printf("2. Search evaluation\n");
     printf("3. Update evaluation\n");
     printf("4. Delete evaluation\n");
-    printf("5. Read evaluation\n");
-    printf("6. Unit Test\n");
+    printf("5. Read all evaluations\n");
+    printf("6. Run Tests\n");
+    printf("7. Run End-to-End (E2E) Test\n");
+    printf("8. Exit\n");
+    printf("============================================\n");
     printf("Select menu: ");
-    scanf("%d", &choice);
-    switch(choice) {
-    case 1: addEvaluation(); break; 
-    case 2: searchEvaluation(); break;
-    case 3: updateEvaluationByID(); break;
-    case 4: deleteEvaluationByID(); break;
-    case 5: readevaluation(); break;
-    case 6: Test(); break;
+    scanf("%d", &choice_num);
+
+    switch(choice_num) {
+        case 1: addEvaluation(); break;
+        case 2: searchEvaluation(); break;
+        case 3: updateEvaluationByID(); break;
+        case 4: deleteEvaluationByID(); break;
+        case 5: readevaluation(); break;
+        case 6: Test(); break;
+        case 7: E2Etest(); break;
+        case 8: printf("\nGoodbye!\n"); break;
+        default:
+            printf("\nInvalid choice, please try again.\n");
+            start();
+            break;
     }
-    
 }
 
+
+//MAIN
+
 int main() {
-   start();
+    start();
+    return 0;
 }
